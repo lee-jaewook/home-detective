@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mvc.model.mapper.NearInfoMapper">
+    <!-- select -->
+    <select id="getSchoolListByAddress" parameterType="Address" resultType="School">
+        select name, level, estDate, sidoName, gugunName, dongName, jibun, lat, lng
+        from school
+        where sidoName like concat('%', #{sidoName}, '%') and gugunName like concat('%', #{gugunName}, '%')
+    </select>
+
+    <select id="getStationListByAddress" parameterType="Address" resultType="Station">
+        select lineNum, name, sidoName, gugunName, dongName, jibun, lat, lng
+        from station
+        where sidoName like concat('%', #{sidoName}, '%') and gugunName like concat('%', #{gugunName}, '%')
+    </select>
+</mapper>

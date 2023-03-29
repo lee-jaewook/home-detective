@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mvc.model.mapper.NoticeMapper">
+
+    <!-- select -->
+    <select id="getAllNoticeList" resultType="Notice">
+        select id, title, content, user_id userId, reg_time regTime, view_count viewCount
+        from notice
+        order by reg_time desc
+    </select>
+
+    <select id="getOneNotice" parameterType="String" resultType="Notice">
+        select id, title, content, user_id userId, reg_time regTime, view_count viewCount
+        from notice
+        where id = #{id}
+    </select>
+
+    <!-- insert -->
+    <insert id="addNotice" parameterType="Notice">
+        insert
+        into notice(title, content, user_id)
+        values (#{title}, #{content}, #{userId})
+    </insert>
+
+    <!-- update -->
+    <update id="modifyNotice" parameterType="Notice">
+        update notice
+        set title = #{title},
+            content = #{content}
+        where id = #{id}
+    </update>
+
+    <update id="countUpViewCount" parameterType="String">
+        update notice
+        set view_count = view_count + 1
+        where id = #{id}
+    </update>
+
+    <!-- delete -->
+    <delete id="deleteNotice" parameterType="String">
+        delete
+        from notice
+        where id = #{id}
+    </delete>
+</mapper>

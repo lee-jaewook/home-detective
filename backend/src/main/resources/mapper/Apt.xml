@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mvc.model.mapper.AptMapper">
+    <select id="getAddressListByGugun" parameterType="String" resultType="Address">
+        select sidoName, gugunName, lat, lng
+        from location
+        where gugunName like concat('%', #{word}, '%') and dongName is null
+        LIMIT 0, 10
+    </select>
+
+    <select id="getAptListByName" parameterType="String" resultType="Apt">
+        select h.aptCode, h.apartmentName, b.sidoName, b.gugunName, b.dongName, h.jibun, h.lat, h.lng
+        from aptinfo h join dongcode b
+        on h.dongcode = b.dongcode
+        where h.apartmentName like concat('%', #{word}, '%')
+        LIMIT 0, 10
+    </select>
+
+    <select id="getAptListByAddress" parameterType="Address" resultType="Apt">
+        select h.aptCode, h.apartmentName, b.sidoName, b.gugunName, b.dongName, h.jibun, h.lat, h.lng
+        from aptinfo h join dongcode b
+        on h.dongCode = b.dongCode
+        where b.sidoName = #{sidoName} and b.gugunName = #{gugunName}
+    </select>
+
+    <select id="getAptByAptCode" parameterType="String" resultType="Apt">
+        select h.aptCode, h.apartmentName, b.sidoName, b.gugunName, b.dongName, h.jibun, h.lat, h.lng
+        from aptinfo h join dongcode b
+        on h.dongCode = b.dongCode
+        where h.aptCode = #{aptCode}
+    </select>
+
+    <select id="getAptDealListByAptCode" parameterType="java.util.Map" resultType="AptDeal">
+        select aptCode, dealAmount, dealYear, dealMonth, dealDay, area, floor
+        from aptdeal
+        where aptCode = #{aptCode}
+        order by dealYear desc, dealMonth desc, dealDay desc
+        LIMIT #{limit} OFFSET #{start}
+    </select>
+
+    <select id="getTotalCountOfDealListByAptCode" parameterType="String" resultType="String">
+        SELECT count(*)
+        from aptdeal
+        where aptCode = #{aptCode}
+    </select>
+
+    <select id="getAptLikeListByUserId" parameterType="String" resultType="Apt">
+        select h.aptCode, h.apartmentName, b.sidoName, b.gugunName, b.dongName, h.jibun, h.lat, h.lng
+        from aptinfo h join (
+        select aptCode
+        from aptlike
+        WHERE userId = #{userId}
+        ) l
+        on h.aptCode = l.aptCode
+        join dongCode b
+        on h.dongCode = b.dongCode;
+    </select>
+
+
+    <insert id="addAptLikeListByLike" parameterType="Like">
+        insert into aptlike values (#{userId}, #{aptCode})
+    </insert>
+
+    <delete id="deleteAptLikeListByLike" parameterType="Like">
+        delete from aptlike
+        where userId = #{userId} and aptCode = #{aptCode}
+    </delete>
+
+    <select id="checkLikedApt" parameterType="Like" resultType="boolean">
+        SELECT count(*)
+        from aptlike
+        where aptCode = #{aptCode} and userId = #{userId}
+    </select>
+
+    <select id="getDealCountOfAptByMonth" resultType="AptDealMonth">
+        select dealYear, dealMonth, deal, amount
+        from
+        (select dealYear, dealMonth, deal, amount
+        from aptDealMonth
+        LIMIT 0, 12) a
+        order by a.dealYear, a.dealMonth;
+    </select>
+
+    <select id="getDealCountOfAptByGugun" resultType="AptDealGugun">
+        select sidoName, gugunName, deal
+        from aptDealGugun
+        LIMIT 0, 5;
+    </select>
+</mapper>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.mvc.model.mapper.QnaMapper">
+    <!-- select -->
+    <select id="getAllQuestionList" parameterType="String" resultType="Qna">
+        select id, title, content, reg_time regTime, user_id userId, count_reply countReply, count_view countView
+        from qna
+        <choose>
+            <!-- 관리자인 경우 -->
+            <when test="userId == 'admin'">
+                where parent_id = 0
+            </when>
+            <!-- 유저 경우 -->
+            <otherwise>
+                where parent_id = 0 and user_id = #{userId}
+            </otherwise>
+        </choose>
+        order by reg_time DESC, count_reply DESC
+    </select>
+
+    <select id="getAllAnswerList" parameterType="String" resultType="Qna">
+        select id, title, content, reg_time regTime, user_id userId, count_reply countReply, count_view countView
+        from qna
+        where parent_id = #{id}
+    </select>
+
+    <select id="getOneQna" parameterType="String" resultType="Qna">
+        select id, title, content, reg_time regTime, user_id userId, count_reply countReply, count_view countView
+        from qna
+        where id = #{id}
+    </select>
+
+    <!-- insert -->
+    <insert id="addQna" parameterType="Qna">
+        insert
+        <choose>
+            <!-- 질문글인 경우 -->
+            <when test="parentId == null">
+                into qna(title, content, user_id)
+                values (#{title}, #{content}, #{userId})
+            </when>
+            <!-- 답변글인 경우 -->
+            <otherwise>
+                into qna(title, content, user_id, parent_id)
+                values (#{title}, #{content}, #{userId}, #{parentId})
+            </otherwise>
+        </choose>
+    </insert>
+
+    <!-- update -->
+    <update id="modifyQna" parameterType="Qna">
+        update qna
+        set title = #{title},
+            content = #{content}
+        where id = #{id}
+    </update>
+
+    <update id="countUpViewCount" parameterType="String">
+        update qna
+        set count_view = count_view + 1
+        where id = #{id}
+    </update>
+
+    <!-- delete -->
+    <delete id="deleteQna" parameterType="String">
+        delete
+        from qna
+        where id = #{id} or parent_id = #{id}
+    </delete>
+
+    <update id="countUpReply" parameterType="String">
+        update qna
+        set count_reply = count_reply + 1
+        where parent_id = #{parentId}
+    </update>
+</mapper>
